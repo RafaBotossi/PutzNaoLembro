@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="PutZ Não Lembro! Um caderno de campanha para D&D com lugares, coisas e pessoas."
+    />
+    <title>PutZ Não Lembro!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=IM+Fell+English:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient-light" aria-hidden="true"></div>
+
+    <main class="app-shell" id="app-shell">
+      <button id="closed-book" class="closed-book" type="button" aria-label="Abrir livro">
+        <img src="assets/logo-livro-fechado.png" alt="PutZ Não Lembro!" />
+      </button>
+
+      <section id="book" class="book" aria-label="Livro de anotações da campanha">
+        <button id="close-book" class="book-close-hotspot" type="button" aria-label="Fechar livro"></button>
+
+        <aside class="book__page book__page--left">
+          <div class="section-heading">
+            <p class="eyebrow">Nova anotação</p>
+            <h2 id="form-title">Adicionar registro</h2>
+          </div>
+
+          <form id="entry-form" class="entry-form">
+            <label>
+              Categoria
+              <select id="category" name="category" required>
+                <option value="Lugares">Lugares</option>
+                <option value="Coisas">Coisas</option>
+                <option value="Pessoas">Pessoas</option>
+              </select>
+            </label>
+
+            <label>
+              Nome ou título
+              <input id="title" name="title" type="text" maxlength="80" autocomplete="off" required />
+            </label>
+
+            <label>
+              Texto
+              <textarea
+                id="text"
+                name="text"
+                rows="8"
+                maxlength="1600"
+                placeholder="Boatos, pistas, descrição, sessão em que apareceu..."
+                required
+              ></textarea>
+            </label>
+
+            <label>
+              Imagem
+              <span class="file-picker">
+                <span class="file-picker__button">Escolher arquivo</span>
+                <span id="image-file-name" class="file-picker__name">Nenhum arquivo selecionado</span>
+                <input id="image" name="image" type="file" accept="image/*" />
+              </span>
+            </label>
+
+            <div class="image-tools">
+              <img id="image-preview" class="image-preview" alt="Pré-visualização da imagem" />
+              <button type="button" id="remove-image" class="text-button">Remover imagem</button>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="button button--primary">Salvar</button>
+              <button type="button" id="cancel-edit" class="button button--secondary">Cancelar</button>
+            </div>
+          </form>
+        </aside>
+
+        <section class="book__page book__page--right">
+          <div class="library-header">
+            <div class="section-heading">
+              <p class="eyebrow">Biblioteca da mesa</p>
+              <h2>Registros salvos</h2>
+              <p id="stats">0 registros</p>
+            </div>
+
+            <div class="library-actions">
+              <button id="export-data" class="button button--secondary" type="button">Exportar</button>
+              <label class="button button--secondary import-button">
+                Importar
+                <input id="import-data" type="file" accept="application/json,.json" />
+              </label>
+              <button id="clear-all" class="button button--danger" type="button">Limpar</button>
+            </div>
+          </div>
+
+          <div id="library-toolbar" class="toolbar">
+            <label class="search-field">
+              <span>Buscar</span>
+              <input id="search" type="search" placeholder="Nome, texto ou categoria" />
+            </label>
+
+            <div class="tabs" role="group" aria-label="Filtrar por categoria">
+              <button class="tab active" type="button" data-filter="all">Tudo</button>
+              <button class="tab" type="button" data-filter="Lugares">Lugares</button>
+              <button class="tab" type="button" data-filter="Coisas">Coisas</button>
+              <button class="tab" type="button" data-filter="Pessoas">Pessoas</button>
+              <button class="tab" type="button" data-filter="inactive">Invisíveis</button>
+            </div>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            <h3>Nada anotado ainda</h3>
+            <p>Crie o primeiro registro e salve a memória da party do esquecimento absoluto.</p>
+          </div>
+
+          <div id="entries-grid" class="entries-grid"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
