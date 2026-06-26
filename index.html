@@ -18,6 +18,7 @@
   </head>
   <body>
     <div class="ambient-light" aria-hidden="true"></div>
+    <audio id="background-music" src="assets/musica.mp3" preload="auto" loop></audio>
 
     <main class="app-shell" id="app-shell">
       <button id="closed-book" class="closed-book" type="button" aria-label="Abrir livro">
@@ -69,7 +70,8 @@
               </span>
             </label>
 
-            <div class="image-tools">
+            <div id="image-drop-zone" class="image-tools" tabindex="0">
+              <p class="image-tools__hint">Arraste uma imagem aqui ou cole com Ctrl+V</p>
               <img id="image-preview" class="image-preview" alt="Pré-visualização da imagem" />
               <button type="button" id="remove-image" class="text-button">Remover imagem</button>
             </div>
@@ -110,8 +112,10 @@
               <button class="tab" type="button" data-filter="Lugares">Lugares</button>
               <button class="tab" type="button" data-filter="Coisas">Coisas</button>
               <button class="tab" type="button" data-filter="Pessoas">Pessoas</button>
-              <button class="tab" type="button" data-filter="inactive">Invisíveis</button>
+              <button class="tab" type="button" data-filter="inactive">Invisível</button>
             </div>
+
+            <button id="sort-toggle" class="sort-toggle" type="button" aria-label="Ordenar de Z a A">A→Z</button>
           </div>
 
           <div id="empty-state" class="empty-state">
@@ -123,6 +127,11 @@
         </section>
       </section>
     </main>
+
+    <div class="music-control" aria-label="Volume da música">
+      <span>Som</span>
+      <input id="volume-slider" type="range" min="0" max="100" value="5" aria-label="Volume da música" />
+    </div>
 
     <script src="app.js"></script>
   </body>

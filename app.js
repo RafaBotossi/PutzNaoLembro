@@ -5,6 +5,8 @@ const IMAGE_MIME_TYPE = "image/jpeg";
 
 const form = document.getElementById("entry-form");
 const appShell = document.getElementById("app-shell");
+const backgroundMusic = document.getElementById("background-music");
+const volumeSlider = document.getElementById("volume-slider");
 const closedBookButton = document.getElementById("closed-book");
 const closeBookButton = document.getElementById("close-book");
 const leftPage = document.querySelector(".book__page--left");
@@ -14,6 +16,7 @@ const textInput = document.getElementById("text");
 const categoryInput = document.getElementById("category");
 const imageInput = document.getElementById("image");
 const imageFileName = document.getElementById("image-file-name");
+const imageDropZone = document.getElementById("image-drop-zone");
 const imagePreview = document.getElementById("image-preview");
 const removeImageButton = document.getElementById("remove-image");
 const entriesGrid = document.getElementById("entries-grid");
@@ -26,6 +29,7 @@ const importInput = document.getElementById("import-data");
 const formTitle = document.getElementById("form-title");
 const searchInput = document.getElementById("search");
 const libraryToolbar = document.getElementById("library-toolbar");
+const sortToggleButton = document.getElementById("sort-toggle");
 const filterButtons = document.querySelectorAll(".tab");
 
 let items = [];
@@ -34,6 +38,9 @@ let selectedImageData = "";
 let activeFilter = "all";
 let searchTerm = "";
 let selectedDetailId = null;
+let sortDirection = "asc";
+
+backgroundMusic.volume = Number(volumeSlider.value) / 100;
 
 function createId() {
   if (window.crypto?.randomUUID) {
@@ -94,6 +101,20 @@ function updateImagePreview() {
   imagePreview.src = selectedImageData;
   imagePreview.style.display = selectedImageData ? "block" : "none";
   removeImageButton.style.display = selectedImageData ? "inline-flex" : "none";
+}
+
+function getFirstImageFile(files) {
+  return [...files].find((file) => file.type.startsWith("image/"));
+}
+
+function getFirstClipboardImage(data) {
+  const file = getFirstImageFile(data?.files || []);
+  if (file) return file;
+
+  return [...(data?.items || [])]
+    .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .find(Boolean);
 }
 
 function escapeHtml(value) {
@@ -176,7 +197,10 @@ function renderItems() {
   emptyState.style.display = "none";
 
   entriesGrid.innerHTML = [...filteredItems]
-    .sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt))
+    .sort((a, b) => {
+      const comparison = a.title.localeCompare(b.title, "pt-BR", { sensitivity: "base" });
+      return sortDirection === "asc" ? comparison : -comparison;
+    })
     .map((item) => {
       const title = escapeHtml(item.title);
       const category = escapeHtml(item.category);
@@ -312,10 +336,18 @@ async function resizeImage(file) {
 
 async function handleImageUpload(event) {
   const file = event.target.files?.[0];
+  await processImageFile(file);
+}
+
+async function processImageFile(file, fallbackName = "Imagem colada") {
   if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    window.alert("Use um arquivo de imagem.");
+    return;
+  }
 
   try {
-    imageFileName.textContent = file.name;
+    imageFileName.textContent = file.name || fallbackName;
     selectedImageData = await resizeImage(file);
     updateImagePreview();
   } catch (error) {
@@ -324,6 +356,33 @@ async function handleImageUpload(event) {
     imageFileName.textContent = "Nenhum arquivo selecionado";
     window.alert("Não consegui deixar essa imagem abaixo de 200 KB. Tente uma imagem menor ou mais simples.");
   }
+}
+
+function handlePaste(event) {
+  if (!appShell.classList.contains("is-book-open")) return;
+
+  const file = getFirstClipboardImage(event.clipboardData);
+  if (!file) return;
+
+  event.preventDefault();
+  processImageFile(file, "Imagem colada");
+}
+
+function handleImageDrag(event) {
+  event.preventDefault();
+  imageDropZone.classList.add("image-tools--dragging");
+}
+
+function clearImageDrag(event) {
+  event.preventDefault();
+  imageDropZone.classList.remove("image-tools--dragging");
+}
+
+function handleImageDrop(event) {
+  event.preventDefault();
+  imageDropZone.classList.remove("image-tools--dragging");
+  const file = getFirstImageFile(event.dataTransfer?.files || []);
+  processImageFile(file, "Imagem arrastada");
 }
 
 function handleSubmit(event) {
@@ -379,6 +438,9 @@ function startEdit(id) {
 
 function openBook() {
   appShell.classList.add("is-book-open");
+  backgroundMusic.play().catch((error) => {
+    console.warn("Não foi possível iniciar a música:", error);
+  });
 }
 
 function closeBook() {
@@ -494,6 +556,11 @@ form.addEventListener("submit", handleSubmit);
 closedBookButton.addEventListener("click", openBook);
 closeBookButton.addEventListener("click", closeBook);
 imageInput.addEventListener("change", handleImageUpload);
+document.addEventListener("paste", handlePaste);
+imageDropZone.addEventListener("dragenter", handleImageDrag);
+imageDropZone.addEventListener("dragover", handleImageDrag);
+imageDropZone.addEventListener("dragleave", clearImageDrag);
+imageDropZone.addEventListener("drop", handleImageDrop);
 removeImageButton.addEventListener("click", () => {
   selectedImageData = "";
   imageInput.value = "";
@@ -542,6 +609,17 @@ entriesGrid.addEventListener("keydown", (event) => {
 searchInput.addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderItems();
+});
+
+sortToggleButton.addEventListener("click", () => {
+  sortDirection = sortDirection === "asc" ? "desc" : "asc";
+  sortToggleButton.textContent = sortDirection === "asc" ? "A→Z" : "Z→A";
+  sortToggleButton.setAttribute("aria-label", sortDirection === "asc" ? "Ordenar de Z a A" : "Ordenar de A a Z");
+  renderItems();
+});
+
+volumeSlider.addEventListener("input", () => {
+  backgroundMusic.volume = Number(volumeSlider.value) / 100;
 });
 
 filterButtons.forEach((button) => {

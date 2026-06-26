@@ -14,6 +14,7 @@
   --danger: #8b2020;
   --shadow: 0 32px 80px rgba(7, 3, 1, 0.46);
   --radius: 8px;
+  --pencil-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23d9a842' stroke='%2323120a' stroke-width='1.5' d='M5 25l2 2 7-2 12-12-4-4L10 21z'/%3E%3Cpath fill='%23f7e7bf' stroke='%2323120a' stroke-width='1.2' d='M22 9l2-2 4 4-2 2z'/%3E%3Cpath fill='%2323120a' d='M5 25l5-4 3 3-6 3z'/%3E%3C/svg%3E") 5 27, auto;
 }
 
 * {
@@ -31,12 +32,13 @@ body {
   height: 100%;
   overflow: hidden;
   margin: 0;
-  font-family: "IM Fell English", Georgia, serif;
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
   color: var(--ink);
   background:
     linear-gradient(180deg, rgba(9, 5, 3, 0.24), rgba(9, 5, 3, 0.74)),
     linear-gradient(90deg, rgba(15, 5, 3, 0.58), transparent 32%, transparent 68%, rgba(15, 5, 3, 0.58)),
     url("assets/FundoLivraria.png") center / cover fixed no-repeat;
+  cursor: var(--pencil-cursor);
 }
 
 body::before {
@@ -60,6 +62,29 @@ textarea {
 button,
 label.import-button {
   -webkit-tap-highlight-color: transparent;
+  cursor: var(--pencil-cursor);
+}
+
+a,
+button,
+label,
+.entry-card,
+.file-picker,
+.import-button {
+  cursor: var(--pencil-cursor);
+}
+
+input,
+select,
+textarea {
+  cursor: text;
+}
+
+input[type="range"],
+input[type="file"],
+select,
+button {
+  cursor: var(--pencil-cursor);
 }
 
 .ambient-light {
@@ -78,6 +103,32 @@ label.import-button {
   height: 100dvh;
   margin: 0 auto;
   padding: 12px 0;
+}
+
+.music-control {
+  position: fixed;
+  right: 16px;
+  bottom: 14px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 230, 168, 0.28);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fff8df;
+  background: rgba(38, 13, 9, 0.72);
+  box-shadow: 0 12px 26px rgba(5, 2, 1, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.music-control span {
+  font-weight: 900;
+}
+
+.music-control input {
+  width: 110px;
+  accent-color: var(--danger);
 }
 
 .closed-book {
@@ -131,6 +182,7 @@ h2,
 h3 {
   font-family: Cinzel, Georgia, serif;
   letter-spacing: 0;
+  line-height: 1.16;
 }
 
 .book {
@@ -219,11 +271,13 @@ h3 {
 }
 
 .book .section-heading h2 {
-  font-size: clamp(1.05rem, 1.65vw, 1.6rem);
+  font-size: clamp(0.86rem, 1.2vw, 1.18rem);
+  line-height: 1.2;
 }
 
 .book .eyebrow {
-  font-size: clamp(0.56rem, 0.8vw, 0.72rem);
+  margin-bottom: 4px;
+  font-size: clamp(0.48rem, 0.62vw, 0.62rem);
 }
 
 .book label,
@@ -232,37 +286,37 @@ h3 {
 .book textarea,
 .book .button,
 .book .tab {
-  font-size: clamp(0.72rem, 0.95vw, 0.88rem);
+  font-size: clamp(0.58rem, 0.72vw, 0.72rem);
 }
 
 .book input,
 .book select,
 .book textarea {
-  padding: clamp(7px, 0.9vw, 10px);
+  padding: clamp(6px, 0.72vw, 8px);
 }
 
 .book textarea {
-  min-height: clamp(90px, 11vw, 135px);
+  min-height: clamp(72px, 8vw, 104px);
 }
 
 .book .entry-form,
 .book .toolbar {
-  gap: clamp(8px, 1vw, 12px);
-  margin-top: clamp(10px, 1.5vw, 18px);
+  gap: clamp(6px, 0.8vw, 9px);
+  margin-top: clamp(7px, 1vw, 12px);
 }
 
 .book .button {
-  min-height: 34px;
-  padding: 8px 10px;
+  min-height: 28px;
+  padding: 6px 8px;
 }
 
 .book .library-header {
   display: grid;
-  gap: 10px;
+  gap: 7px;
 }
 
 .book .library-actions {
-  gap: 7px;
+  gap: 5px;
 }
 
 .book .tabs {
@@ -288,7 +342,7 @@ h3 {
 }
 
 .book .entry-card__title {
-  font-size: clamp(0.68rem, 0.86vw, 0.82rem);
+  font-size: clamp(0.56rem, 0.72vw, 0.7rem);
   line-height: 1.05;
 }
 
@@ -309,9 +363,29 @@ h3 {
 }
 
 .book .entry-card__actions button {
-  min-height: 28px;
-  padding: 4px;
-  font-size: clamp(0.62rem, 0.75vw, 0.72rem);
+  min-height: 24px;
+  padding: 3px;
+  font-size: clamp(0.54rem, 0.64vw, 0.64rem);
+}
+
+.book .search-field input {
+  min-height: 30px;
+}
+
+.book .empty-state h3 {
+  font-size: clamp(0.74rem, 1vw, 0.95rem);
+}
+
+.book .empty-state p,
+.book #stats {
+  font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+  line-height: 1.25;
+}
+
+.book .visibility-toggle {
+  min-width: 22px;
+  min-height: 22px;
+  font-size: 0.78rem;
 }
 
 .section-heading,
@@ -344,7 +418,7 @@ h3 {
 
 label {
   display: grid;
-  gap: 7px;
+  gap: 5px;
   font-weight: 800;
 }
 
@@ -354,7 +428,7 @@ textarea {
   width: 100%;
   border: 1px solid rgba(88, 43, 18, 0.34);
   border-radius: 8px;
-  padding: 12px 13px;
+  padding: 10px 11px;
   color: var(--ink);
   background: rgba(255, 248, 227, 0.76);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
@@ -378,7 +452,28 @@ textarea {
 
 .image-tools {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+  border: 1px dashed rgba(88, 43, 18, 0.34);
+  border-radius: 8px;
+  padding: 6px;
+  background: rgba(255, 248, 227, 0.36);
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.image-tools--dragging,
+.image-tools:focus-visible {
+  border-color: #d98b33;
+  background: rgba(255, 229, 174, 0.58);
+  box-shadow: 0 0 0 3px rgba(217, 139, 51, 0.16);
+  outline: none;
+}
+
+.image-tools__hint {
+  margin: 0;
+  color: rgba(39, 26, 18, 0.72);
+  font-size: clamp(0.56rem, 0.68vw, 0.68rem);
+  font-weight: 800;
+  text-align: center;
 }
 
 .file-picker {
@@ -401,7 +496,7 @@ textarea {
   min-width: 0;
   border: 1px solid rgba(88, 43, 18, 0.34);
   border-radius: 8px;
-  padding: clamp(7px, 0.9vw, 10px);
+  padding: clamp(6px, 0.72vw, 8px);
   background: rgba(255, 248, 227, 0.76);
 }
 
@@ -444,17 +539,17 @@ textarea {
 .library-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 7px;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 34px;
   border: 1px solid rgba(78, 32, 20, 0.22);
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 8px 11px;
   font-weight: 900;
   color: var(--ink);
   background: rgba(255, 248, 227, 0.64);
@@ -517,8 +612,16 @@ textarea {
 
 .toolbar {
   display: grid;
-  gap: 14px;
-  margin: 22px 0 18px;
+  gap: 9px;
+  margin: 12px 0 10px;
+}
+
+.book .toolbar {
+  grid-template-columns: 1fr auto;
+}
+
+.book .search-field {
+  grid-column: 1 / -1;
 }
 
 .search-field span {
@@ -533,13 +636,13 @@ textarea {
 
 .tab {
   min-width: 0;
-  min-height: 34px;
+  min-height: 28px;
   border: 1px solid rgba(88, 43, 18, 0.26);
   border-radius: 8px;
-  padding: 6px 4px;
+  padding: 4px 3px;
   color: var(--leather);
   background: rgba(255, 248, 227, 0.62);
-  font-size: clamp(0.58rem, 0.78vw, 0.76rem);
+  font-size: clamp(0.48rem, 0.62vw, 0.62rem);
   font-weight: 900;
   cursor: pointer;
 }
@@ -550,9 +653,22 @@ textarea {
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.sort-toggle {
+  min-width: 42px;
+  min-height: 28px;
+  border: 1px solid rgba(88, 43, 18, 0.26);
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: #fff8df;
+  background: linear-gradient(135deg, var(--wine), #9b4a22);
+  font-size: clamp(0.48rem, 0.62vw, 0.62rem);
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .empty-state {
   display: none;
-  padding: 26px;
+  padding: 14px;
   border: 1px dashed rgba(88, 43, 18, 0.38);
   border-radius: 8px;
   text-align: center;
@@ -629,7 +745,7 @@ textarea {
 }
 
 .entry-card__body {
-  padding: 14px;
+  padding: 10px;
 }
 
 .entry-card__header {
@@ -642,7 +758,7 @@ textarea {
 .entry-card__title {
   margin: 0;
   color: var(--leather);
-  font-size: 1.12rem;
+  font-size: 0.92rem;
   overflow-wrap: anywhere;
 }
 
