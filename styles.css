@@ -311,13 +311,13 @@ h3 {
 }
 
 .book .section-heading h2 {
-  font-size: clamp(0.86rem, 1.2vw, 1.18rem);
+  font-size: 18px;
   line-height: 1.2;
 }
 
 .book .eyebrow {
   margin-bottom: 4px;
-  font-size: clamp(0.48rem, 0.62vw, 0.62rem);
+  font-size: 10px;
 }
 
 .book label,
@@ -326,7 +326,7 @@ h3 {
 .book textarea,
 .book .button,
 .book .tab {
-  font-size: clamp(0.58rem, 0.72vw, 0.72rem);
+  font-size: 12px;
 }
 
 .book input,
@@ -383,7 +383,7 @@ h3 {
 }
 
 .book .entry-card__title {
-  font-size: clamp(0.56rem, 0.72vw, 0.7rem);
+  font-size: 11px;
   line-height: 1.05;
 }
 
@@ -406,7 +406,7 @@ h3 {
 .book .entry-card__actions button {
   min-height: 24px;
   padding: 3px;
-  font-size: clamp(0.54rem, 0.64vw, 0.64rem);
+  font-size: 10px;
 }
 
 .book .search-field input {
@@ -414,12 +414,12 @@ h3 {
 }
 
 .book .empty-state h3 {
-  font-size: clamp(0.74rem, 1vw, 0.95rem);
+  font-size: 15px;
 }
 
 .book .empty-state p,
 .book #stats {
-  font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+  font-size: 12px;
   line-height: 1.25;
 }
 
@@ -688,9 +688,10 @@ textarea {
   padding: 6px 4px;
   color: var(--leather);
   background: rgba(255, 248, 227, 0.62);
-  font-size: clamp(0.5rem, 0.66vw, 0.68rem);
+  font-size: 10px;
   font-weight: 900;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -708,9 +709,10 @@ textarea {
   padding: 6px 7px;
   color: #fff8df;
   background: linear-gradient(135deg, var(--wine), #9b4a22);
-  font-size: clamp(0.5rem, 0.66vw, 0.68rem);
+  font-size: 10px;
   font-weight: 900;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
 }
 
