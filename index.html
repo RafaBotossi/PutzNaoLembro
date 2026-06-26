@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="PutZ Não Lembro! Um caderno de campanha para D&D com lugares, coisas e pessoas."
+      content="PutZ Não Lembro! Um caderno de campanha para D&D com lugares, coisas e personagens."
     />
     <title>PutZ Não Lembro!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,7 +40,7 @@
               <select id="category" name="category" required>
                 <option value="Lugares">Lugares</option>
                 <option value="Coisas">Coisas</option>
-                <option value="Pessoas">Pessoas</option>
+                <option value="Personagens">Personagens</option>
               </select>
             </label>
 
@@ -98,6 +98,7 @@
                 <input id="import-data" type="file" accept="application/json,.json" />
               </label>
               <button id="clear-all" class="button button--danger" type="button">Limpar</button>
+              <button id="load-example" class="button button--secondary" type="button">Carregar Exemplo</button>
             </div>
           </div>
 
@@ -111,7 +112,7 @@
               <button class="tab active" type="button" data-filter="all">Tudo</button>
               <button class="tab" type="button" data-filter="Lugares">Lugares</button>
               <button class="tab" type="button" data-filter="Coisas">Coisas</button>
-              <button class="tab" type="button" data-filter="Pessoas">Pessoas</button>
+              <button class="tab" type="button" data-filter="Personagens">Personagens</button>
               <button class="tab" type="button" data-filter="inactive">Invisível</button>
             </div>
 
@@ -131,6 +132,11 @@
     <div class="music-control" aria-label="Volume da música">
       <span>Som</span>
       <input id="volume-slider" type="range" min="0" max="100" value="5" aria-label="Volume da música" />
+    </div>
+
+    <div id="image-lightbox" class="image-lightbox" aria-hidden="true">
+      <button id="image-lightbox-close" class="image-lightbox__close" type="button" aria-label="Fechar imagem">X</button>
+      <img id="image-lightbox-img" class="image-lightbox__image" alt="" />
     </div>
 
     <script src="app.js"></script>

@@ -24,6 +24,7 @@ const emptyState = document.getElementById("empty-state");
 const stats = document.getElementById("stats");
 const cancelEditButton = document.getElementById("cancel-edit");
 const clearAllButton = document.getElementById("clear-all");
+const loadExampleButton = document.getElementById("load-example");
 const exportButton = document.getElementById("export-data");
 const importInput = document.getElementById("import-data");
 const formTitle = document.getElementById("form-title");
@@ -31,6 +32,9 @@ const searchInput = document.getElementById("search");
 const libraryToolbar = document.getElementById("library-toolbar");
 const sortToggleButton = document.getElementById("sort-toggle");
 const filterButtons = document.querySelectorAll(".tab");
+const imageLightbox = document.getElementById("image-lightbox");
+const imageLightboxImage = document.getElementById("image-lightbox-img");
+const imageLightboxClose = document.getElementById("image-lightbox-close");
 
 let items = [];
 let editingId = null;
@@ -40,7 +44,12 @@ let searchTerm = "";
 let selectedDetailId = null;
 let sortDirection = "asc";
 
-backgroundMusic.volume = Number(volumeSlider.value) / 100;
+function updateVolume() {
+  const value = Math.max(0, Math.min(100, Number(volumeSlider.value) || 0));
+  backgroundMusic.volume = value / 100;
+}
+
+updateVolume();
 
 function createId() {
   if (window.crypto?.randomUUID) {
@@ -76,11 +85,13 @@ function saveItems() {
 }
 
 function normalizeItem(item) {
+  const category = item.category === "Pessoas" ? "Personagens" : item.category;
+
   return {
     id: item.id || createId(),
     title: String(item.title || "").trim(),
     text: String(item.text || "").trim(),
-    category: ["Lugares", "Coisas", "Pessoas"].includes(item.category) ? item.category : "Coisas",
+    category: ["Lugares", "Coisas", "Personagens"].includes(category) ? category : "Coisas",
     image: item.image || "",
     inactive: Boolean(item.inactive),
     createdAt: Number(item.createdAt) || Date.now(),
@@ -130,7 +141,7 @@ function getCategoryClass(category) {
   const normalized = String(category).toLowerCase();
   if (normalized === "lugares") return "category-lugares";
   if (normalized === "coisas") return "category-coisas";
-  return "category-pessoas";
+  return "category-personagens";
 }
 
 function formatDate(timestamp) {
@@ -177,7 +188,7 @@ function renderItems() {
   const inactiveTotal = items.length - activeTotal;
 
   stats.textContent = activeTotal
-    ? `${filteredItems.length} de ${activeTotal} ativos · ${getCategoryCount("Lugares")} lugares · ${getCategoryCount("Coisas")} coisas · ${getCategoryCount("Pessoas")} pessoas · ${inactiveTotal} inativos`
+    ? `${filteredItems.length} de ${activeTotal} ativos · ${getCategoryCount("Lugares")} lugares · ${getCategoryCount("Coisas")} coisas · ${getCategoryCount("Personagens")} personagens · ${inactiveTotal} inativos`
     : `${inactiveTotal} inativos`;
 
   if (!items.length) {
@@ -215,7 +226,7 @@ function renderItems() {
           </button>
           ${
             item.image
-              ? `<div class="entry-card__image"><img src="${item.image}" alt="Imagem de ${title}" loading="lazy" /></div>`
+              ? `<div class="entry-card__image"><img src="${item.image}" alt="Imagem de ${title}" loading="lazy" data-action="view-image" data-src="${item.image}" /></div>`
               : `<div class="entry-card__image" aria-hidden="true"></div>`
           }
           <div class="entry-card__body">
@@ -257,7 +268,7 @@ function renderItemDetail(item) {
       </div>
       ${
         item.image
-          ? `<div class="entry-detail__image"><img src="${item.image}" alt="Imagem de ${title}" /></div>`
+          ? `<div class="entry-detail__image"><img src="${item.image}" alt="Imagem de ${title}" data-action="view-image" data-src="${item.image}" /></div>`
           : ""
       }
       <div class="entry-detail__header">
@@ -305,6 +316,10 @@ function loadImage(file) {
 }
 
 async function resizeImage(file) {
+  if (file.size <= MAX_IMAGE_BYTES) {
+    return blobToDataUrl(file);
+  }
+
   const image = await loadImage(file);
   let maxSide = Math.min(900, Math.max(image.width, image.height));
   let bestBlob = null;
@@ -476,6 +491,19 @@ function backToList() {
   renderItems();
 }
 
+function setActiveFilter(filter) {
+  activeFilter = filter;
+  filterButtons.forEach((tab) => tab.classList.toggle("active", tab.dataset.filter === filter));
+}
+
+function resetLibraryView() {
+  searchTerm = "";
+  searchInput.value = "";
+  selectedDetailId = null;
+  setActiveFilter("all");
+  rightPage.scrollTop = 0;
+}
+
 function removeItem(id) {
   const item = items.find((entry) => entry.id === id);
   if (!item) return;
@@ -552,6 +580,61 @@ function importData(event) {
   reader.readAsText(file);
 }
 
+async function loadExampleData() {
+  const confirmed =
+    !items.length || window.confirm("Carregar o exemplo e substituir os registros atuais?");
+
+  if (!confirmed) return;
+
+  try {
+    loadExampleButton.disabled = true;
+    loadExampleButton.textContent = "Carregando...";
+
+    const exampleUrl = new URL("assets/exemplo.json", window.location.href);
+    if (window.location.protocol !== "file:") {
+      exampleUrl.searchParams.set("v", Date.now());
+    }
+
+    const response = await fetch(exampleUrl, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Falha ao carregar exemplo: ${response.status}`);
+    }
+
+    const exampleItems = normalizeImportedItems(await response.json());
+    if (!exampleItems.length) {
+      throw new Error("O exemplo não tem registros válidos.");
+    }
+
+    items = exampleItems;
+    saveItems();
+    resetForm();
+    resetLibraryView();
+    renderItems();
+  } catch (error) {
+    console.error(error);
+    window.alert("Não consegui carregar o exemplo. Confira se assets/exemplo.json está publicado junto com o site.");
+  } finally {
+    loadExampleButton.disabled = false;
+    loadExampleButton.textContent = "Carregar Exemplo";
+  }
+}
+
+function openImageLightbox(src, alt) {
+  if (!src) return;
+
+  imageLightboxImage.src = src;
+  imageLightboxImage.alt = alt || "Imagem da anotação";
+  imageLightbox.classList.add("is-open");
+  imageLightbox.setAttribute("aria-hidden", "false");
+}
+
+function closeImageLightbox() {
+  imageLightbox.classList.remove("is-open");
+  imageLightbox.setAttribute("aria-hidden", "true");
+  imageLightboxImage.removeAttribute("src");
+  imageLightboxImage.alt = "";
+}
+
 form.addEventListener("submit", handleSubmit);
 closedBookButton.addEventListener("click", openBook);
 closeBookButton.addEventListener("click", closeBook);
@@ -570,6 +653,7 @@ removeImageButton.addEventListener("click", () => {
 cancelEditButton.addEventListener("click", resetForm);
 exportButton.addEventListener("click", exportData);
 importInput.addEventListener("change", importData);
+loadExampleButton.addEventListener("click", loadExampleData);
 
 clearAllButton.addEventListener("click", () => {
   if (!items.length) return;
@@ -584,6 +668,13 @@ clearAllButton.addEventListener("click", () => {
 });
 
 entriesGrid.addEventListener("click", (event) => {
+  const image = event.target.closest("[data-action='view-image']");
+  if (image) {
+    event.stopPropagation();
+    openImageLightbox(image.getAttribute("data-src"), image.alt);
+    return;
+  }
+
   const button = event.target.closest("button");
   if (button) {
     const id = button.getAttribute("data-id");
@@ -619,14 +710,25 @@ sortToggleButton.addEventListener("click", () => {
 });
 
 volumeSlider.addEventListener("input", () => {
-  backgroundMusic.volume = Number(volumeSlider.value) / 100;
+  updateVolume();
+});
+
+imageLightboxClose.addEventListener("click", closeImageLightbox);
+
+imageLightbox.addEventListener("click", (event) => {
+  if (event.target === imageLightbox) closeImageLightbox();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && imageLightbox.classList.contains("is-open")) {
+    closeImageLightbox();
+  }
 });
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
     selectedDetailId = null;
-    filterButtons.forEach((tab) => tab.classList.toggle("active", tab === button));
+    setActiveFilter(button.dataset.filter);
     renderItems();
   });
 });
